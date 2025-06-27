@@ -27,6 +27,17 @@ The application reads configuration from environment variables:
 | `TEAMS_WEBHOOK_URL` | Microsoft Teams Incoming Webhook URL        | **Required** |
 | `WEBHOOK_TOKEN`     | Secret token for validating incoming requests | (empty = disabled) |
 
+### Secret Token Authentication
+
+If you set the `WEBHOOK_TOKEN` environment variable, the app will require all incoming alert POST requests to include a matching token in the `X-Webhook-Token` HTTP header. This adds a simple layer of authentication to prevent unauthorized requests.
+
+- If `WEBHOOK_TOKEN` is **not set** or empty, no token validation is performed and any POST request to `/alerts` is accepted.
+- If `WEBHOOK_TOKEN` **is set**, the app checks the `X-Webhook-Token` header on incoming requests:
+  - If the header is missing or does not match the configured token, the request is rejected with HTTP 401 Unauthorized.
+  - If the header matches, the request is processed normally.
+
+Make sure your Prometheus Alertmanager or any client sending alerts includes this header if token validation is enabled.
+
 ---
 
 ## Building
